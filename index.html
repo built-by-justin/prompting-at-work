@@ -198,40 +198,40 @@ var starters = [{
   code: "Draft a [email / Slack message] to [role] about [topic].\nTone: [direct / diplomatic / formal].\nKey point: [one sentence \u2014 what they need to know or do].\nKeep it under [X] lines. No filler opener.",
   tip: "Pro tip: Adding 'No filler opener' eliminates lines like 'Hope this finds you well' and gets straight to the point — especially important for Slack."
 }, {
-  label: "Meeting Debrief → Action Items",
+  label: "Meeting Debrief \u2192 Action Items",
   code: "Here are my notes from a meeting:\n[paste notes or transcript]\n\nExtract:\n1. Decisions made (owner + outcome)\n2. Action items (owner, task, deadline if stated)\n3. Open questions still unresolved\n\nFormat as a table. Flag any items with no clear owner.",
   tip: null
 }];
 var checklist = {
   critical: [{
     item: "Key facts are verifiable — spot-check claims before sharing",
-    risk: "🔴 High risk if skipped"
+    risk: "\uD83D\uDD34 High risk if skipped"
   }, {
     item: "Sensitive or private data has been removed from the output",
-    risk: "🔴 High risk if skipped"
+    risk: "\uD83D\uDD34 High risk if skipped"
   }, {
     item: "Assumptions are visible — not baked in without disclosure",
-    risk: "🔴 High risk if skipped"
+    risk: "\uD83D\uDD34 High risk if skipped"
   }, {
     item: "Numbers, names, and citations have been independently verified — not assumed correct",
-    risk: "🔴 High risk if skipped"
+    risk: "\uD83D\uDD34 High risk if skipped"
   }],
   important: [{
     item: "Claims can be traced to a source or confirmed independently",
-    risk: "🟡 Suboptimal if skipped"
+    risk: "\uD83D\uDFE1 Suboptimal if skipped"
   }, {
     item: "The output is clear to the intended reader, not just to you",
-    risk: "🟡 Suboptimal if skipped"
+    risk: "\uD83D\uDFE1 Suboptimal if skipped"
   }, {
     item: "The format supports the next action — not just the current one",
-    risk: "🟡 Suboptimal if skipped"
+    risk: "\uD83D\uDFE1 Suboptimal if skipped"
   }],
   niceToHave: [{
     item: "Format is reusable for similar tasks in the future",
-    risk: "⚪ Optional"
+    risk: "\u26AA Optional"
   }, {
     item: "A person has reviewed and owns the final version",
-    risk: "⚪ Optional"
+    risk: "\u26AA Optional"
   }]
 };
 var failures = [{
@@ -268,7 +268,7 @@ var sectionPrinciples = {
   verify: {
     label: "The Review Principle",
     quote: "\"You are the editor. The model is the first draft. That division of labour never changes.\"",
-    note: "Prompt → Inspect → Refine → Verify. The loop doesn't end at the first response — it ends when a person has reviewed and owns the output."
+    note: "Prompt \u2192 Inspect \u2192 Refine \u2192 Verify. The loop doesn't end at the first response — it ends when a person has reviewed and owns the output."
   }
 };
 function SectionHeader(_ref) {
@@ -540,7 +540,7 @@ function App() {
     }
   }, "Simple prompt skeleton"), /*#__PURE__*/React.createElement("button", {
     onClick: function onClick() {
-      return copy("[Write / Analyze / Summarize] [task] for [audience].\nUse this context: [paste what matters].\nInclude: [must-haves]. Avoid: [exclusions].\nReturn it as: [format \u2014 e.g., 3 bullets, table, short paragraph].\nBefore writing, list your assumptions and any facts I should verify.", "skeleton");
+      return copy("[Write / Analyze / Summarize] [task] for [audience].\nContext: [paste what matters].\nInclude: [must-haves].\nAvoid: [exclusions].\nFormat: [e.g., 3 bullets / table / short paragraph / keep under X words].\nBefore writing, list your assumptions and any facts I should verify.", "skeleton");
     },
     style: {
       background: copied === "skeleton" ? "#E8C547" : "#333",
@@ -561,7 +561,7 @@ function App() {
       margin: 0,
       whiteSpace: "pre-wrap"
     }
-  }, "[Write / Analyze / Summarize] [task] for [audience].\nUse this context: [paste what matters].\nInclude: [must-haves]. Avoid: [exclusions].\nReturn it as: [format \u2014 e.g., 3 bullets, table, short paragraph].\nBefore writing, list your assumptions and any facts I should verify."))), active === "build" && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(SectionHeader, {
+  }, "[Write / Analyze / Summarize] [task] for [audience].\nContext: [paste what matters].\nInclude: [must-haves].\nAvoid: [exclusions].\nFormat: [e.g., 3 bullets / table / short paragraph / keep under X words].\nBefore writing, list your assumptions and any facts I should verify."))), active === "build" && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(SectionHeader, {
     title: "Anatomy of a Strong Prompt",
     sub: "Seven ingredients. Use what you need."
   }), /*#__PURE__*/React.createElement(SectionEpigraph, {
