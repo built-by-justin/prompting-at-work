@@ -300,28 +300,30 @@ function SectionEpigraph(_ref2) {
   var quote = _ref2.quote,
     note = _ref2.note;
   return /*#__PURE__*/React.createElement("div", {
-    style: _defineProperty({
+    style: {
+      borderTop: "3px solid #E8C547",
       borderLeft: "4px solid #E8C547",
-      background: "#fff",
-      padding: "14px 18px",
+      borderRight: "1px solid #E0DDD8",
+      borderBottom: "1px solid #E0DDD8",
+      background: "#FFFDF5",
+      padding: "16px 20px",
       marginBottom: 28,
-      borderRadius: "0 6px 6px 0",
-      border: "1px solid #E0DDD8"
-    }, "borderLeft", "4px solid #E8C547")
+      borderRadius: "0 6px 6px 0"
+    }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 15,
       fontWeight: 800,
       fontStyle: "italic",
       color: "#1A1A1A",
-      lineHeight: 1.5,
-      marginBottom: note ? 6 : 0
+      lineHeight: 1.6,
+      marginBottom: note ? 8 : 0
     }
   }, quote), note && /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 12,
       color: "#666",
-      lineHeight: 1.5
+      lineHeight: 1.6
     }
   }, note));
 }
@@ -420,17 +422,18 @@ function App() {
   }, "The clearer your prompt, the better your output \u2014 every time, no exceptions."), /*#__PURE__*/React.createElement("div", {
     style: {
       background: "#2A2A2A",
-      borderLeft: "3px solid #E8C547",
-      padding: "10px 16px",
+      borderTop: "3px solid #555",
+      borderRadius: "0 0 4px 4px",
+      padding: "12px 16px",
       fontSize: 13,
       color: "#C2C2C2",
-      maxWidth: 600
+      lineHeight: 1.6
     }
   }, /*#__PURE__*/React.createElement("strong", {
     style: {
       color: "#F7F6F3"
     }
-  }, "How to use this guide:"), " Work top to bottom the first time. After that, jump directly to the section you need. Every section has at least one thing you can apply in your next prompt."))), /*#__PURE__*/React.createElement("div", {
+  }, "How to use this guide:"), " Start at 01\u2014ORIENT and work through each tab in order. Once familiar, jump to any section directly. Every tab is self-contained."))), /*#__PURE__*/React.createElement("div", {
     style: {
       background: "#EEECEA",
       borderBottom: "1px solid #D9D6D0",
@@ -1172,8 +1175,7 @@ function App() {
     style: {
       marginTop: 8
     }
-  }, "\"Don't use output for anything that matters without a human in the loop.\""))))));
-}
+  }, "\"Don't use output for anything that matters without a human in the loop.\""))))));\n}
 ReactDOM.createRoot(document.getElementById("root")).render(/*#__PURE__*/React.createElement(App, null));
 
 </script>
@@ -1191,7 +1193,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(/*#__PURE__*/React.c
   Built by <a href="https://github.com/built-by-justin" target="_blank" rel="noopener noreferrer"
      style="color: #888; text-decoration: none; border-bottom: 1px solid #444; padding-bottom: 1px; transition: color 0.15s;"
      onmouseover="this.style.color='#E8C547'; this.style.borderBottomColor='#E8C547';"
-     onmouseout="this.style.color='#888'; this.style.borderBottomColor='#444';">Justin</a> &nbsp;&middot;&nbsp; v1.2
+     onmouseout="this.style.color='#888'; this.style.borderBottomColor='#444';">Justin</a> &nbsp;&middot;&nbsp; v1.3
 </footer>
 </body>
 </html>
