@@ -39,8 +39,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
   body { font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; background: #F7F6F3; color: #1A1A1A; }
-  pre { font-family: 'Fira Mono', 'Courier New', monospace; }
+  pre { font-family: 'Fira Mono', 'Courier New', monospace; line-height: 1.7; }
+  button:focus-visible { outline: 2px solid #E8C547; outline-offset: 2px; }
+  @media (max-width: 480px) { .content-area { padding: 1.25rem 1rem 3rem !important; } }
 </style>
 </head>
 <body>
@@ -288,7 +291,7 @@ function SectionHeader(_ref) {
   }, title), /*#__PURE__*/React.createElement("p", {
     style: {
       margin: 0,
-      color: "#888",
+      color: "#666",
       fontSize: 15
     }
   }, sub));
@@ -317,7 +320,7 @@ function SectionEpigraph(_ref2) {
   }, quote), note && /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 12,
-      color: "#888",
+      color: "#666",
       lineHeight: 1.5
     }
   }, note));
@@ -364,6 +367,12 @@ function App() {
       return setCopied(null);
     }, 1800);
   };
+  var handleTabClick = function handleTabClick(id) {
+    setActive(id);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+  var totalItems = checklist.critical.length + checklist.important.length + checklist.niceToHave.length;
+  var checkedCount = Object.values(checked).filter(Boolean).length;
   return /*#__PURE__*/React.createElement("div", {
     style: {
       fontFamily: "'Inter','Helvetica Neue',sans-serif",
@@ -375,12 +384,13 @@ function App() {
     style: {
       background: "#1A1A1A",
       color: "#F7F6F3",
-      padding: "2.5rem 2rem 2rem"
+      padding: "2.5rem 0 2rem"
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       maxWidth: 860,
-      margin: "0 auto"
+      margin: "0 auto",
+      padding: "0 2rem"
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -424,7 +434,8 @@ function App() {
     style: {
       background: "#EEECEA",
       borderBottom: "1px solid #D9D6D0",
-      overflowX: "auto"
+      overflowX: "auto",
+      WebkitOverflowScrolling: "touch"
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -438,12 +449,14 @@ function App() {
     return /*#__PURE__*/React.createElement("button", {
       key: s.id,
       onClick: function onClick() {
-        return setActive(s.id);
+        return handleTabClick(s.id);
       },
+      "aria-label": s.label + " section",
       style: {
         background: active === s.id ? "#1A1A1A" : "transparent",
         color: active === s.id ? "#F7F6F3" : "#555",
         border: "none",
+        borderBottom: active === s.id ? "3px solid #E8C547" : "3px solid transparent",
         padding: "12px 16px",
         fontSize: 12,
         fontWeight: 700,
@@ -455,6 +468,7 @@ function App() {
       }
     }, s.label);
   }))), /*#__PURE__*/React.createElement("div", {
+    className: "content-area",
     style: {
       maxWidth: 860,
       margin: "0 auto",
@@ -542,6 +556,7 @@ function App() {
     onClick: function onClick() {
       return copy("You are a [role] helping [audience].\n[Write / Analyze / Summarize] [task].\nContext: [paste what matters].\nInclude: [must-haves].\nAvoid: [exclusions].\nFormat: [e.g., 3 bullets / table / short paragraph / keep under X words].\nBefore writing, list your assumptions and any facts I should verify.", "universal-starter");
     },
+    "aria-label": "Copy universal starter prompt",
     style: {
       background: copied === "universal-starter" ? "#E8C547" : "#333",
       color: copied === "universal-starter" ? "#1A1A1A" : "#E8C547",
@@ -725,6 +740,7 @@ function App() {
       onClick: function onClick() {
         return copy(p.prompt, p.name);
       },
+      "aria-label": "Copy " + p.name + " prompt",
       style: {
         background: copied === p.name ? "#1A1A1A" : "#F0EDE8",
         color: copied === p.name ? "#E8C547" : "#555",
@@ -846,6 +862,7 @@ function App() {
       onClick: function onClick() {
         return copy(s.code, s.label);
       },
+      "aria-label": "Copy " + s.label + " starter",
       style: {
         background: copied === s.label ? "#1A1A1A" : "#F0EDE8",
         color: copied === s.label ? "#E8C547" : "#555",
@@ -869,10 +886,51 @@ function App() {
   }), /*#__PURE__*/React.createElement("p", {
     style: {
       color: "#555",
-      marginBottom: 24,
+      marginBottom: 16,
       fontSize: 15
     }
   }, "Every AI output is a draft until you've reviewed it. The checklist below is ordered by risk \u2014 start at the top."), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginBottom: 24,
+      background: "#fff",
+      border: "1px solid #E0DDD8",
+      borderRadius: 8,
+      padding: "12px 16px"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 8
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      fontWeight: 700,
+      color: "#1A1A1A"
+    }
+  }, checkedCount + " / " + totalItems + " reviewed"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      color: "#888"
+    }
+  }, checkedCount === totalItems ? "\u2713 All done" : "")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      height: 6,
+      background: "#F0EDE8",
+      borderRadius: 4,
+      overflow: "hidden"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      height: "100%",
+      width: (checkedCount / totalItems * 100) + "%",
+      background: "#C8A020",
+      borderRadius: 4,
+      transition: "width 0.3s ease"
+    }
+  }))), /*#__PURE__*/React.createElement("div", {
     style: {
       marginBottom: 24
     }
@@ -898,6 +956,7 @@ function App() {
         sessionStorage.removeItem("cl_checked");
       } catch (_unused3) {}
     },
+    "aria-label": "Clear all checklist items",
     style: {
       background: "transparent",
       border: "1px solid #D9D6D0",
@@ -1132,7 +1191,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(/*#__PURE__*/React.c
   Built by <a href="https://github.com/built-by-justin" target="_blank" rel="noopener noreferrer"
      style="color: #888; text-decoration: none; border-bottom: 1px solid #444; padding-bottom: 1px; transition: color 0.15s;"
      onmouseover="this.style.color='#E8C547'; this.style.borderBottomColor='#E8C547';"
-     onmouseout="this.style.color='#888'; this.style.borderBottomColor='#444';">Justin</a> &nbsp;&middot;&nbsp; v1.1
+     onmouseout="this.style.color='#888'; this.style.borderBottomColor='#444';">Justin</a> &nbsp;&middot;&nbsp; v1.2
 </footer>
 </body>
 </html>
