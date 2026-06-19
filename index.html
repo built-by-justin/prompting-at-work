@@ -34,7 +34,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Fira+Mono:wght@400;500&display=swap" rel="stylesheet">
 
 <!-- Favicon -->
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%E2%9C%8D%EF%B8%8F</text></svg>">
+<link rel="icon" href="./favicon.svg">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <style>
@@ -42,7 +42,7 @@
   html { scroll-behavior: smooth; }
   body { font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; background: #F7F6F3; color: #1A1A1A; }
   pre { font-family: 'Fira Mono', 'Courier New', monospace; line-height: 1.7; }
-  button:focus-visible { outline: 2px solid #E8C547; outline-offset: 2px; }
+  :focus-visible { outline: 2px solid #E8C547; outline-offset: 2px; border-radius: 4px; }
   @media (max-width: 480px) { .content-area { padding: 1.25rem 1rem 3rem !important; } }
 </style>
 </head>
@@ -71,7 +71,7 @@ var sections = [{
   id: "build",
   label: "02 \u2014 BUILD",
   title: "Anatomy of a Strong Prompt",
-  subtitle: "Seven ingredients. Use what you need."
+  subtitle: "Seven ingredients. Use what fits."
 }, {
   id: "execute",
   label: "03 \u2014 EXECUTE",
@@ -111,25 +111,25 @@ var clearSteps = [{
 }];
 var ingredients = [{
   label: "TASK",
-  desc: "Outcome + what success looks like"
+  desc: "The action you want done and what a good result looks like"
 }, {
   label: "CONTEXT",
-  desc: "Source text, facts, rules, brand terms"
+  desc: "Background the model needs \u2014 source material, relevant facts, constraints, or brand guidelines"
 }, {
   label: "AUDIENCE",
-  desc: "Who reads or acts on this output"
+  desc: "Who will read, use, or act on this \u2014 shapes tone, depth, and vocabulary"
 }, {
   label: "LIMITS",
-  desc: "Privacy rules, exclusions, what to avoid"
+  desc: "What the model should not do, include, or assume \u2014 privacy rules, off-limits topics, or hard constraints"
 }, {
   label: "FORMAT",
-  desc: "Headers, bullets, table, length"
+  desc: "How you want the output structured \u2014 headers, bullets, a table, plain prose, or a length cap"
 }, {
   label: "EXAMPLES",
-  desc: "Samples when consistency matters"
+  desc: "One or two samples showing the tone, structure, or style you want the model to follow"
 }, {
   label: "VERIFY",
-  desc: "Assumptions and facts to check before use"
+  desc: "A prompt to the model to flag its own assumptions, uncertainties, or anything you should double-check"
 }];
 var patterns = [{
   name: "The Iteration Lock",
@@ -325,13 +325,7 @@ function App() {
     _React$useState4 = _slicedToArray(_React$useState3, 2),
     copied = _React$useState4[0],
     setCopied = _React$useState4[1];
-  var _React$useState5 = React.useState(function () {
-      try {
-        return JSON.parse(sessionStorage.getItem("cl_checked") || "{}");
-      } catch (_unused) {
-        return {};
-      }
-    }),
+  var _React$useState5 = React.useState({}),
     _React$useState6 = _slicedToArray(_React$useState5, 2),
     checked = _React$useState6[0],
     setChecked = _React$useState6[1];
@@ -342,9 +336,6 @@ function App() {
   var toggleCheck = function toggleCheck(key) {
     setChecked(function (prev) {
       var next = _objectSpread(_objectSpread({}, prev), {}, _defineProperty({}, key, !prev[key]));
-      try {
-        sessionStorage.setItem("cl_checked", JSON.stringify(next));
-      } catch (_unused2) {}
       return next;
     });
   };
@@ -639,9 +630,9 @@ function App() {
         )
       ),
       active === "build" && /*#__PURE__*/React.createElement("div", null,
-        /*#__PURE__*/React.createElement(SectionHeader, { title: "Anatomy of a Strong Prompt", sub: "Seven ingredients. Use what you need." }),
+        /*#__PURE__*/React.createElement(SectionHeader, { title: "Anatomy of a Strong Prompt", sub: "Seven ingredients. Use what fits." }),
         /*#__PURE__*/React.createElement(SectionEpigraph, { quote: sectionPrinciples["build"].quote, note: sectionPrinciples["build"].note }),
-        /*#__PURE__*/React.createElement("p", { style: { color: "#555", marginBottom: 24, fontSize: 15 } }, "Not every prompt needs all seven. A quick task might only need TASK + FORMAT. A high-stakes deliverable needs all of them."),
+        /*#__PURE__*/React.createElement("p", { style: { color: "#555", marginBottom: 24, fontSize: 15 } }, "Not every prompt needs all seven. A quick internal task might only need TASK + FORMAT. A high-stakes deliverable \u2014 something you'll share, act on, or send to a client \u2014 warrants all of them."),
         /*#__PURE__*/React.createElement("div", { style: { display: "grid", gap: 8, marginBottom: 32 } }, ingredients.map(function (ing) {
           return /*#__PURE__*/React.createElement("div", {
             key: ing.label,
@@ -698,7 +689,7 @@ function App() {
           }
         },
           /*#__PURE__*/React.createElement("div", { style: { fontWeight: 700, marginBottom: 6, fontSize: 14 } }, "Pro tip: Anchor the output"),
-          /*#__PURE__*/React.createElement("p", { style: { margin: 0, color: "#444", fontSize: 14, lineHeight: 1.6 } }, "Paste a short example of the output you want \u2014 even a rough sketch. Output anchoring dramatically reduces formatting surprises. One good example beats three paragraphs of format instructions.")
+          /*#__PURE__*/React.createElement("p", { style: { margin: 0, color: "#444", fontSize: 14, lineHeight: 1.6 } }, "Paste a short example of the output you want \u2014 even a rough sketch. One concrete example reduces formatting surprises more reliably than three paragraphs of instructions.")
         )
       ),
       active === "execute" && /*#__PURE__*/React.createElement("div", null,
@@ -927,9 +918,6 @@ function App() {
             /*#__PURE__*/React.createElement("button", {
               onClick: function onClick() {
                 setChecked({});
-                try {
-                  sessionStorage.removeItem("cl_checked");
-                } catch (_unused3) {}
               },
               "aria-label": "Clear all checklist items",
               style: {
@@ -1000,7 +988,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(/*#__PURE__*/React.c
   Built by <a href="https://github.com/built-by-justin" target="_blank" rel="noopener noreferrer"
      style="color: #888; text-decoration: none; border-bottom: 1px solid #444; padding-bottom: 1px; transition: color 0.15s;"
      onmouseover="this.style.color='#E8C547'; this.style.borderBottomColor='#E8C547';"
-     onmouseout="this.style.color='#888'; this.style.borderBottomColor='#444';">Justin</a> &nbsp;&middot;&nbsp; v1.4.1
+     onmouseout="this.style.color='#888'; this.style.borderBottomColor='#444';">Justin</a> &nbsp;&middot;&nbsp; v1.4.5
 </footer>
 </body>
 </html>
