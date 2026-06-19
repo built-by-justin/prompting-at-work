@@ -207,31 +207,23 @@ var starters = [{
 }];
 var checklist = {
   always: [{
-    item: "No private or sensitive information is included in the output",
-    risk: "\uD83D\uDD34 High risk if skipped"
+    item: "No private or sensitive information is included in the output"
   }, {
-    item: "The claims that could embarrass or mislead someone have been spot-checked",
-    risk: "\uD83D\uDD34 High risk if skipped"
+    item: "The claims that could embarrass or mislead someone have been spot-checked"
   }, {
-    item: "This output clearly belongs to a person \u2014 you \u2014 not just \u201Cthe AI\u201D",
-    risk: "\uD83D\uDD34 High risk if skipped"
+    item: "This output clearly belongs to a person \u2014 you \u2014 not just \u201Cthe AI\u201D"
   }],
   shared: [{
-    item: "Key facts, numbers, and names have been verified against a source",
-    risk: "\uD83D\uDFE1 Suboptimal if skipped"
+    item: "Key facts, numbers, and names have been verified against a source"
   }, {
-    item: "Assumptions are stated \u2014 not buried inside confident-sounding sentences",
-    risk: "\uD83D\uDFE1 Suboptimal if skipped"
+    item: "Assumptions are stated \u2014 not buried inside confident-sounding sentences"
   }, {
-    item: "The output is complete \u2014 nothing important was left out or dodged",
-    risk: "\uD83D\uDFE1 Suboptimal if skipped"
+    item: "The output is complete \u2014 nothing important was left out or dodged"
   }],
   highStakes: [{
-    item: "The tone and framing are appropriate for this specific reader",
-    risk: "\u26AA Optional"
+    item: "The tone and framing are appropriate for this specific reader"
   }, {
-    item: "Someone else has read this before it goes out",
-    risk: "\u26AA Optional"
+    item: "Someone else has read this before it goes out"
   }]
 };
 var failures = [{
@@ -419,47 +411,33 @@ function App() {
           key: c.item,
           style: {
             display: "flex",
-            justifyContent: "space-between",
             alignItems: "center",
             background: cfg.bg,
             border: "1px solid " + cfg.border,
             borderRadius: 8,
             padding: "12px 16px",
-            gap: 12,
-            flexWrap: "wrap"
+            gap: 10
           }
         },
-          /*#__PURE__*/React.createElement("div", {
-            style: { display: "flex", gap: 10, alignItems: "center" }
-          },
-            /*#__PURE__*/React.createElement("input", {
-              type: "checkbox",
-              checked: !!checked[c.item],
-              onChange: function onChange() { return toggleCheck(c.item); },
-              style: {
-                width: 16,
-                height: 16,
-                accentColor: cfg.accent,
-                flexShrink: 0,
-                cursor: "pointer"
-              }
-            }),
-            /*#__PURE__*/React.createElement("span", {
-              style: { fontSize: 14 }
-            }, c.item)
-          ),
-          /*#__PURE__*/React.createElement("span", {
+          /*#__PURE__*/React.createElement("input", {
+            type: "checkbox",
+            checked: !!checked[c.item],
+            onChange: function onChange() { return toggleCheck(c.item); },
             style: {
-              fontSize: 12,
-              color: cfg.color,
-              fontWeight: 600,
-              whiteSpace: "nowrap"
+              width: 16,
+              height: 16,
+              accentColor: cfg.accent,
+              flexShrink: 0,
+              cursor: "pointer"
             }
-          }, c.risk)
+          }),
+          /*#__PURE__*/React.createElement("span", {
+            style: { fontSize: 14 }
+          }, c.item)
         );
       }))
     );
-  }
+  } // end renderTier
   return /*#__PURE__*/React.createElement("div", {
     style: {
       fontFamily: "'Inter','Helvetica Neue',sans-serif",
@@ -1022,7 +1000,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(/*#__PURE__*/React.c
   Built by <a href="https://github.com/built-by-justin" target="_blank" rel="noopener noreferrer"
      style="color: #888; text-decoration: none; border-bottom: 1px solid #444; padding-bottom: 1px; transition: color 0.15s;"
      onmouseover="this.style.color='#E8C547'; this.style.borderBottomColor='#E8C547';"
-     onmouseout="this.style.color='#888'; this.style.borderBottomColor='#444';">Justin</a> &nbsp;&middot;&nbsp; v1.4.0 (dev)
+     onmouseout="this.style.color='#888'; this.style.borderBottomColor='#444';">Justin</a> &nbsp;&middot;&nbsp; v1.4.1 (dev)
 </footer>
 </body>
 </html>
