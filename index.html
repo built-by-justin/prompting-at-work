@@ -71,7 +71,7 @@ var sections = [{
   id: "build",
   label: "02 \u2014 BUILD",
   title: "Anatomy of a Strong Prompt",
-  subtitle: "Seven ingredients. Use what you need."
+  subtitle: "Seven ingredients. Use what fits."
 }, {
   id: "execute",
   label: "03 \u2014 EXECUTE",
@@ -111,25 +111,25 @@ var clearSteps = [{
 }];
 var ingredients = [{
   label: "TASK",
-  desc: "Outcome + what success looks like"
+  desc: "The action you want done and what a good result looks like"
 }, {
   label: "CONTEXT",
-  desc: "Source text, facts, rules, brand terms"
+  desc: "Background the model needs \u2014 source material, relevant facts, constraints, or brand guidelines"
 }, {
   label: "AUDIENCE",
-  desc: "Who reads or acts on this output"
+  desc: "Who will read, use, or act on this \u2014 shapes tone, depth, and vocabulary"
 }, {
   label: "LIMITS",
-  desc: "Privacy rules, exclusions, what to avoid"
+  desc: "What the model should not do, include, or assume \u2014 privacy rules, off-limits topics, or hard constraints"
 }, {
   label: "FORMAT",
-  desc: "Headers, bullets, table, length"
+  desc: "How you want the output structured \u2014 headers, bullets, a table, plain prose, or a length cap"
 }, {
   label: "EXAMPLES",
-  desc: "Samples when consistency matters"
+  desc: "One or two samples showing the tone, structure, or style you want the model to follow"
 }, {
   label: "VERIFY",
-  desc: "Assumptions and facts to check before use"
+  desc: "A prompt to the model to flag its own assumptions, uncertainties, or anything you should double-check"
 }];
 var patterns = [{
   name: "The Iteration Lock",
@@ -639,9 +639,9 @@ function App() {
         )
       ),
       active === "build" && /*#__PURE__*/React.createElement("div", null,
-        /*#__PURE__*/React.createElement(SectionHeader, { title: "Anatomy of a Strong Prompt", sub: "Seven ingredients. Use what you need." }),
+        /*#__PURE__*/React.createElement(SectionHeader, { title: "Anatomy of a Strong Prompt", sub: "Seven ingredients. Use what fits." }),
         /*#__PURE__*/React.createElement(SectionEpigraph, { quote: sectionPrinciples["build"].quote, note: sectionPrinciples["build"].note }),
-        /*#__PURE__*/React.createElement("p", { style: { color: "#555", marginBottom: 24, fontSize: 15 } }, "Not every prompt needs all seven. A quick task might only need TASK + FORMAT. A high-stakes deliverable needs all of them."),
+        /*#__PURE__*/React.createElement("p", { style: { color: "#555", marginBottom: 24, fontSize: 15 } }, "Not every prompt needs all seven. A quick internal task might only need TASK + FORMAT. A high-stakes deliverable \u2014 something you'll share, act on, or send to a client \u2014 warrants all of them."),
         /*#__PURE__*/React.createElement("div", { style: { display: "grid", gap: 8, marginBottom: 32 } }, ingredients.map(function (ing) {
           return /*#__PURE__*/React.createElement("div", {
             key: ing.label,
@@ -698,7 +698,7 @@ function App() {
           }
         },
           /*#__PURE__*/React.createElement("div", { style: { fontWeight: 700, marginBottom: 6, fontSize: 14 } }, "Pro tip: Anchor the output"),
-          /*#__PURE__*/React.createElement("p", { style: { margin: 0, color: "#444", fontSize: 14, lineHeight: 1.6 } }, "Paste a short example of the output you want \u2014 even a rough sketch. Output anchoring dramatically reduces formatting surprises. One good example beats three paragraphs of format instructions.")
+          /*#__PURE__*/React.createElement("p", { style: { margin: 0, color: "#444", fontSize: 14, lineHeight: 1.6 } }, "Paste a short example of the output you want \u2014 even a rough sketch. One concrete example reduces formatting surprises more reliably than three paragraphs of instructions.")
         )
       ),
       active === "execute" && /*#__PURE__*/React.createElement("div", null,
@@ -1000,7 +1000,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(/*#__PURE__*/React.c
   Built by <a href="https://github.com/built-by-justin" target="_blank" rel="noopener noreferrer"
      style="color: #888; text-decoration: none; border-bottom: 1px solid #444; padding-bottom: 1px; transition: color 0.15s;"
      onmouseover="this.style.color='#E8C547'; this.style.borderBottomColor='#E8C547';"
-     onmouseout="this.style.color='#888'; this.style.borderBottomColor='#444';">Justin</a> &nbsp;&middot;&nbsp; v1.4.1 (dev)
+     onmouseout="this.style.color='#888'; this.style.borderBottomColor='#444';">Justin</a> &nbsp;&middot;&nbsp; v1.4.2 (dev)
 </footer>
 </body>
 </html>
