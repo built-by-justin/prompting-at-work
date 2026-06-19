@@ -42,7 +42,7 @@
   html { scroll-behavior: smooth; }
   body { font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; background: #F7F6F3; color: #1A1A1A; }
   pre { font-family: 'Fira Mono', 'Courier New', monospace; line-height: 1.7; }
-  button:focus-visible { outline: 2px solid #E8C547; outline-offset: 2px; }
+  :focus-visible { outline: 2px solid #E8C547; outline-offset: 2px; border-radius: 4px; }
   @media (max-width: 480px) { .content-area { padding: 1.25rem 1rem 3rem !important; } }
 </style>
 </head>
@@ -325,13 +325,7 @@ function App() {
     _React$useState4 = _slicedToArray(_React$useState3, 2),
     copied = _React$useState4[0],
     setCopied = _React$useState4[1];
-  var _React$useState5 = React.useState(function () {
-      try {
-        return JSON.parse(sessionStorage.getItem("cl_checked") || "{}");
-      } catch (_unused) {
-        return {};
-      }
-    }),
+  var _React$useState5 = React.useState({}),
     _React$useState6 = _slicedToArray(_React$useState5, 2),
     checked = _React$useState6[0],
     setChecked = _React$useState6[1];
@@ -342,9 +336,6 @@ function App() {
   var toggleCheck = function toggleCheck(key) {
     setChecked(function (prev) {
       var next = _objectSpread(_objectSpread({}, prev), {}, _defineProperty({}, key, !prev[key]));
-      try {
-        sessionStorage.setItem("cl_checked", JSON.stringify(next));
-      } catch (_unused2) {}
       return next;
     });
   };
@@ -927,9 +918,6 @@ function App() {
             /*#__PURE__*/React.createElement("button", {
               onClick: function onClick() {
                 setChecked({});
-                try {
-                  sessionStorage.removeItem("cl_checked");
-                } catch (_unused3) {}
               },
               "aria-label": "Clear all checklist items",
               style: {
@@ -1000,7 +988,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(/*#__PURE__*/React.c
   Built by <a href="https://github.com/built-by-justin" target="_blank" rel="noopener noreferrer"
      style="color: #888; text-decoration: none; border-bottom: 1px solid #444; padding-bottom: 1px; transition: color 0.15s;"
      onmouseover="this.style.color='#E8C547'; this.style.borderBottomColor='#E8C547';"
-     onmouseout="this.style.color='#888'; this.style.borderBottomColor='#444';">Justin</a> &nbsp;&middot;&nbsp; v1.4.2 (dev)
+     onmouseout="this.style.color='#888'; this.style.borderBottomColor='#444';">Justin</a> &nbsp;&middot;&nbsp; v1.4.3 (dev)
 </footer>
 </body>
 </html>
