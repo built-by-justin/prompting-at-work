@@ -86,7 +86,7 @@ var sections = [{
   id: "verify",
   label: "05 \u2014 VERIFY",
   title: "Review Before You Use It",
-  subtitle: "The final check for high-stakes output."
+  subtitle: "Every output gets a review. The stakes decide how deep."
 }];
 var clearSteps = [{
   letter: "C",
@@ -206,28 +206,31 @@ var starters = [{
   tip: "Pro tip: If your notes are messy or shorthand, add: 'Clean up the language but do not infer intent \u2014 flag anything ambiguous rather than interpreting it.' This prevents the model from filling gaps with plausible-sounding but wrong decisions."
 }];
 var checklist = {
-  critical: [{
-    item: "Core claims can be independently traced to a reliable source.",
+  always: [{
+    item: "No private or sensitive information is included in the output",
     risk: "\uD83D\uDD34 High risk if skipped"
   }, {
-    item: "Sensitive or private data has been removed from the output",
+    item: "The claims that could embarrass or mislead someone have been spot-checked",
     risk: "\uD83D\uDD34 High risk if skipped"
   }, {
-    item: "Assumptions are visible \u2014 not baked in without disclosure",
+    item: "This output clearly belongs to a person \u2014 you \u2014 not just \u201Cthe AI\u201D",
     risk: "\uD83D\uDD34 High risk if skipped"
   }],
-  important: [{
-    item: "The output is clear to the intended reader, not just to you",
+  shared: [{
+    item: "Key facts, numbers, and names have been verified against a source",
     risk: "\uD83D\uDFE1 Suboptimal if skipped"
   }, {
-    item: "The format supports the next action \u2014 not just the current one",
+    item: "Assumptions are stated \u2014 not buried inside confident-sounding sentences",
+    risk: "\uD83D\uDFE1 Suboptimal if skipped"
+  }, {
+    item: "The output is complete \u2014 nothing important was left out or dodged",
     risk: "\uD83D\uDFE1 Suboptimal if skipped"
   }],
-  niceToHave: [{
-    item: "Format is reusable for similar tasks in the future",
+  highStakes: [{
+    item: "The tone and framing are appropriate for this specific reader",
     risk: "\u26AA Optional"
   }, {
-    item: "A person has reviewed and owns the final version",
+    item: "Someone else has read this before it goes out",
     risk: "\u26AA Optional"
   }]
 };
@@ -265,7 +268,7 @@ var sectionPrinciples = {
   verify: {
     label: "The Review Principle",
     quote: "\"You are the editor. The model is the first draft. That division of labour never changes.\"",
-    note: "The prompting lifecycle doesn't end at the first response \u2014 it ends when a human has reviewed and owns the output."
+    note: "The rule isn\u2019t \u2018verify everything equally.\u2019 It\u2019s \u2018know what you\u2019re sending and who it reaches.\u2019 One question covers most of it: what happens if this is wrong?"
   }
 };
 function SectionHeader(_ref) {
@@ -340,6 +343,10 @@ function App() {
     _React$useState6 = _slicedToArray(_React$useState5, 2),
     checked = _React$useState6[0],
     setChecked = _React$useState6[1];
+  var _React$useState7 = React.useState("standard"),
+    _React$useState8 = _slicedToArray(_React$useState7, 2),
+    stakeLevel = _React$useState8[0],
+    setStakeLevel = _React$useState8[1];
   var toggleCheck = function toggleCheck(key) {
     setChecked(function (prev) {
       var next = _objectSpread(_objectSpread({}, prev), {}, _defineProperty({}, key, !prev[key]));
@@ -367,8 +374,92 @@ function App() {
     setActive(id);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-  var totalItems = checklist.critical.length + checklist.important.length + checklist.niceToHave.length;
-  var checkedCount = Object.values(checked).filter(Boolean).length;
+  var visibleItems = stakeLevel === "quick"
+    ? checklist.always
+    : stakeLevel === "standard"
+      ? checklist.always.concat(checklist.shared)
+      : checklist.always.concat(checklist.shared).concat(checklist.highStakes);
+  var totalItems = visibleItems.length;
+  var checkedCount = visibleItems.filter(function (c) { return !!checked[c.item]; }).length;
+  var stakeLevels = [{
+    id: "quick",
+    label: "Quick check"
+  }, {
+    id: "standard",
+    label: "Standard"
+  }, {
+    id: "full",
+    label: "Full review"
+  }];
+  var tierConfig = {
+    always: { label: "Always \u2014 every output", color: "#E05C5C", bg: "#FFF5F5", border: "#F0C0C0", accent: "#E05C5C" },
+    shared: { label: "If shared or used to make a decision", color: "#C07A00", bg: "#FFFBF0", border: "#E8C547", accent: "#C07A00" },
+    highStakes: { label: "If high-stakes \u2014 client-facing, legal, financial, or irreversible", color: "#888", bg: "#F7F6F3", border: "#DDD", accent: "#999" }
+  };
+  function renderTier(tierKey, items) {
+    var cfg = tierConfig[tierKey];
+    return /*#__PURE__*/React.createElement("div", {
+      key: tierKey,
+      style: { marginBottom: 24 }
+    },
+      /*#__PURE__*/React.createElement("div", {
+        style: {
+          fontWeight: 800,
+          fontSize: 13,
+          letterSpacing: "0.1em",
+          textTransform: "uppercase",
+          color: cfg.color,
+          marginBottom: 10
+        }
+      }, cfg.label),
+      /*#__PURE__*/React.createElement("div", {
+        style: { display: "grid", gap: 8 }
+      }, items.map(function (c) {
+        return /*#__PURE__*/React.createElement("div", {
+          key: c.item,
+          style: {
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            background: cfg.bg,
+            border: "1px solid " + cfg.border,
+            borderRadius: 8,
+            padding: "12px 16px",
+            gap: 12,
+            flexWrap: "wrap"
+          }
+        },
+          /*#__PURE__*/React.createElement("div", {
+            style: { display: "flex", gap: 10, alignItems: "center" }
+          },
+            /*#__PURE__*/React.createElement("input", {
+              type: "checkbox",
+              checked: !!checked[c.item],
+              onChange: function onChange() { return toggleCheck(c.item); },
+              style: {
+                width: 16,
+                height: 16,
+                accentColor: cfg.accent,
+                flexShrink: 0,
+                cursor: "pointer"
+              }
+            }),
+            /*#__PURE__*/React.createElement("span", {
+              style: { fontSize: 14 }
+            }, c.item)
+          ),
+          /*#__PURE__*/React.createElement("span", {
+            style: {
+              fontSize: 12,
+              color: cfg.color,
+              fontWeight: 600,
+              whiteSpace: "nowrap"
+            }
+          }, c.risk)
+        );
+      }))
+    );
+  }
   return /*#__PURE__*/React.createElement("div", {
     style: {
       fontFamily: "'Inter','Helvetica Neue',sans-serif",
@@ -376,799 +467,544 @@ function App() {
       minHeight: "100vh",
       color: "#1A1A1A"
     }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      background: "#1A1A1A",
-      color: "#F7F6F3",
-      padding: "2.5rem 0 2rem"
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      maxWidth: 860,
-      margin: "0 auto",
-      padding: "0 2rem"
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 11,
-      letterSpacing: "0.18em",
-      color: "#A6A6A6",
-      fontWeight: 600,
-      marginBottom: 12,
-      textTransform: "uppercase"
-    }
-  }, "Practical Workplace Reference"), /*#__PURE__*/React.createElement("h1", {
-    style: {
-      fontSize: "clamp(2rem, 5vw, 3.2rem)",
-      fontWeight: 800,
-      margin: "0 0 10px",
-      lineHeight: 1.1,
-      letterSpacing: "-0.02em"
-    }
-  }, "Prompting at Work"), /*#__PURE__*/React.createElement("p", {
-    style: {
-      fontSize: 16,
-      color: "#C2C2C2",
-      margin: "0 0 1.5rem",
-      lineHeight: 1.6
-    }
-  }, "Structure your prompt, and the output takes care of itself."), /*#__PURE__*/React.createElement("div", {
-    style: {
-      background: "#2A2A2A",
-      borderTop: "3px solid #555",
-      borderRadius: "0 0 4px 4px",
-      padding: "12px 16px",
-      fontSize: 13,
-      color: "#C2C2C2",
-      lineHeight: 1.6
-    }
-  }, /*#__PURE__*/React.createElement("strong", {
-    style: {
-      color: "#F7F6F3"
-    }
-  }, "How to use this guide:"), " New here? Start at 01\u2014ORIENT. Returning? Jump to any tab \u2014 each is self-contained."))), /*#__PURE__*/React.createElement("div", {
-    style: {
-      background: "#EEECEA",
-      borderBottom: "1px solid #D9D6D0",
-      overflowX: "auto",
-      WebkitOverflowScrolling: "touch"
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      maxWidth: 860,
-      margin: "0 auto",
-      display: "flex",
-      gap: 2,
-      padding: "0 2rem"
-    }
-  }, sections.map(function (s) {
-    return /*#__PURE__*/React.createElement("button", {
-      key: s.id,
-      onClick: function onClick() {
-        return handleTabClick(s.id);
-      },
-      "aria-label": s.label + " section",
+  },
+    /*#__PURE__*/React.createElement("div", {
       style: {
-        background: active === s.id ? "#1A1A1A" : "transparent",
-        color: active === s.id ? "#F7F6F3" : "#555",
-        border: "none",
-        borderBottom: active === s.id ? "3px solid #E8C547" : "3px solid transparent",
-        padding: "12px 16px",
-        fontSize: 12,
-        fontWeight: 700,
-        letterSpacing: "0.08em",
-        cursor: "pointer",
-        whiteSpace: "nowrap",
-        textTransform: "uppercase",
-        transition: "all 0.15s"
-      }
-    }, s.label);
-  }))), /*#__PURE__*/React.createElement("div", {
-    className: "content-area",
-    style: {
-      maxWidth: 860,
-      margin: "0 auto",
-      padding: "2rem 2rem 4rem"
-    }
-  }, active === "orient" && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(SectionHeader, {
-    title: "The CLEAR Method",
-    sub: "Your five-step prompt that always works"
-  }), /*#__PURE__*/React.createElement(SectionEpigraph, {
-    quote: sectionPrinciples["orient"].quote,
-    note: sectionPrinciples["orient"].note
-  }), /*#__PURE__*/React.createElement("p", {
-    style: {
-      color: "#555",
-      marginBottom: 28,
-      fontSize: 15
-    }
-  }, "Use this sequence when stakes are high, output must be reliable, or you're producing output you'll share with others."), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "grid",
-      gap: 12
-    }
-  }, clearSteps.map(function (s) {
-    return /*#__PURE__*/React.createElement("div", {
-      key: s.letter,
-      style: {
-        display: "flex",
-        gap: 16,
-        background: "#fff",
-        border: "1px solid #E0DDD8",
-        borderRadius: 8,
-        padding: "16px 20px",
-        alignItems: "center"
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        minWidth: 44,
-        height: 44,
         background: "#1A1A1A",
-        color: "#E8C547",
-        borderRadius: 6,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontWeight: 900,
-        fontSize: 20,
-        fontFamily: "monospace",
-        flexShrink: 0
+        color: "#F7F6F3",
+        padding: "2.5rem 0 2rem"
       }
-    }, s.letter), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontWeight: 700,
-        fontSize: 15,
-        marginBottom: 4
-      }
-    }, s.word), /*#__PURE__*/React.createElement("div", {
-      style: {
-        color: "#555",
-        fontSize: 14
-      }
-    }, s.desc)));
-  })), /*#__PURE__*/React.createElement("div", {
-    style: {
-      marginTop: 28,
-      background: "#1A1A1A",
-      borderRadius: 8,
-      padding: "20px 24px"
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: 6
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 11,
-      letterSpacing: "0.15em",
-      color: "#AAA",
-      fontWeight: 600,
-      textTransform: "uppercase"
-    }
-  }, "Universal Starter Prompt"), /*#__PURE__*/React.createElement("button", {
-    onClick: function onClick() {
-      return copy("You are a [role] helping [audience].\n[Write / Analyze / Summarize] [task].\nContext: [paste what matters].\nInclude: [must-haves].\nAvoid: [exclusions].\nFormat: [e.g., 3 bullets / table / short paragraph / keep under X words].\nBefore writing, list your assumptions and any facts I should verify.", "universal-starter");
     },
-    "aria-label": "Copy universal starter prompt",
-    style: {
-      background: copied === "universal-starter" ? "#E8C547" : "#333",
-      color: copied === "universal-starter" ? "#1A1A1A" : "#E8C547",
-      border: "none",
-      borderRadius: 6,
-      padding: "6px 14px",
-      fontSize: 12,
-      cursor: "pointer",
-      fontWeight: 700,
-      transition: "all 0.2s"
-    }
-  }, copied === "universal-starter" ? "Copied!" : "Copy")), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 12,
-      color: "#E0DDD8",
-      fontStyle: "italic",
-      marginBottom: 12,
-      lineHeight: 1.5
-    }
-  }, "This prompt applies all five CLEAR steps in sequence. The opening line is optional \u2014 add it when tone, expertise level, or audience specificity matters."), /*#__PURE__*/React.createElement("pre", {
-    style: {
-      color: "#E8C547",
-      fontSize: 13,
-      lineHeight: 1.7,
-      margin: 0,
-      whiteSpace: "pre-wrap"
-    }
-  }, "You are a [role] helping [audience].\n[Write / Analyze / Summarize] [task].\nContext: [paste what matters].\nInclude: [must-haves].\nAvoid: [exclusions].\nFormat: [e.g., 3 bullets / table / short paragraph / keep under X words].\nBefore writing, list your assumptions and any facts I should verify."))), active === "build" && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(SectionHeader, {
-    title: "Anatomy of a Strong Prompt",
-    sub: "Seven ingredients. Use what you need."
-  }), /*#__PURE__*/React.createElement(SectionEpigraph, {
-    quote: sectionPrinciples["build"].quote,
-    note: sectionPrinciples["build"].note
-  }), /*#__PURE__*/React.createElement("p", {
-    style: {
-      color: "#555",
-      marginBottom: 24,
-      fontSize: 15
-    }
-  }, "Not every prompt needs all seven. A quick task might only need TASK + FORMAT. A high-stakes deliverable needs all of them."), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "grid",
-      gap: 8,
-      marginBottom: 32
-    }
-  }, ingredients.map(function (ing) {
-    return /*#__PURE__*/React.createElement("div", {
-      key: ing.label,
-      style: {
-        display: "flex",
-        gap: 16,
-        background: "#fff",
-        border: "1px solid #E0DDD8",
-        borderRadius: 8,
-        padding: "14px 20px",
-        alignItems: "center"
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        width: 110,
-        minWidth: 110,
-        fontWeight: 800,
-        fontSize: 12,
-        letterSpacing: "0.1em",
-        color: "#1A1A1A",
-        background: "#F0EDE8",
-        padding: "4px 14px",
-        borderRadius: 4,
-        textAlign: "center",
-        flexShrink: 0
-      }
-    }, ing.label), /*#__PURE__*/React.createElement("div", {
-      style: {
-        color: "#444",
-        fontSize: 14
-      }
-    }, ing.desc));
-  })), /*#__PURE__*/React.createElement("div", {
-    style: {
-      background: "#FFF8E1",
-      border: "1px solid #E8C547",
-      borderRadius: 8,
-      padding: "16px 20px",
-      marginBottom: 20
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontWeight: 700,
-      marginBottom: 6,
-      fontSize: 14
-    }
-  }, "Pro tip: Priming works"), /*#__PURE__*/React.createElement("p", {
-    style: {
-      margin: 0,
-      color: "#444",
-      fontSize: 14,
-      lineHeight: 1.6
-    }
-  }, "Opening with ", /*#__PURE__*/React.createElement("em", null, "\"You are a [role] helping [audience]\u2026\""), " before your actual request isn't flattery \u2014 it primes the model's response style, vocabulary, and depth. A prompt primed for a senior analyst reads differently than one primed for a general audience.")), /*#__PURE__*/React.createElement("div", {
-    style: {
-      background: "#F0F4FF",
-      border: "1px solid #C5D0F0",
-      borderRadius: 8,
-      padding: "16px 20px"
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontWeight: 700,
-      marginBottom: 6,
-      fontSize: 14
-    }
-  }, "Pro tip: Anchor the output"), /*#__PURE__*/React.createElement("p", {
-    style: {
-      margin: 0,
-      color: "#444",
-      fontSize: 14,
-      lineHeight: 1.6
-    }
-  }, "Paste a short example of the output you want \u2014 even a rough sketch. Output anchoring dramatically reduces formatting surprises. One good example beats three paragraphs of format instructions."))), active === "execute" && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(SectionHeader, {
-    title: "Prompt Patterns",
-    sub: "Pick the one that fits your situation."
-  }), /*#__PURE__*/React.createElement(SectionEpigraph, {
-    quote: sectionPrinciples["execute"].quote,
-    note: sectionPrinciples["execute"].note
-  }), /*#__PURE__*/React.createElement("p", {
-    style: {
-      color: "#555",
-      marginBottom: 24,
-      fontSize: 15
-    }
-  }, "Each pattern targets a specific failure mode. Read the \"use when\" trigger to find your situation, then copy the pattern."), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "grid",
-      gap: 12,
-      marginBottom: 32
-    }
-  }, patterns.map(function (p) {
-    return /*#__PURE__*/React.createElement("div", {
-      key: p.name,
-      style: {
-        background: "#fff",
-        border: "1px solid #E0DDD8",
-        borderRadius: 8,
-        padding: "16px 20px"
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        marginBottom: 10
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontWeight: 800,
-        fontSize: 15,
-        marginBottom: 4
-      }
-    }, p.name), /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 12,
-        color: "#555",
-        fontStyle: "normal"
-      }
-    }, "Use when: ", p.trigger)), /*#__PURE__*/React.createElement("div", {
-      style: {
-        display: "flex",
-        alignItems: "flex-start",
-        gap: 10
-      }
-    }, /*#__PURE__*/React.createElement("pre", {
-      style: {
-        margin: 0,
-        fontSize: 13,
-        color: "#333",
-        background: "#F7F6F3",
-        padding: "10px 14px",
-        borderRadius: 6,
-        flex: 1,
-        whiteSpace: "pre-wrap",
-        lineHeight: 1.6
-      }
-    }, p.prompt), /*#__PURE__*/React.createElement("button", {
-      onClick: function onClick() {
-        return copy(p.prompt, p.name);
+      /*#__PURE__*/React.createElement("div", {
+        style: { maxWidth: 860, margin: "0 auto", padding: "0 2rem" }
       },
-      "aria-label": "Copy " + p.name + " prompt",
+        /*#__PURE__*/React.createElement("div", {
+          style: {
+            fontSize: 11,
+            letterSpacing: "0.18em",
+            color: "#A6A6A6",
+            fontWeight: 600,
+            marginBottom: 12,
+            textTransform: "uppercase"
+          }
+        }, "Practical Workplace Reference"),
+        /*#__PURE__*/React.createElement("h1", {
+          style: {
+            fontSize: "clamp(2rem, 5vw, 3.2rem)",
+            fontWeight: 800,
+            margin: "0 0 10px",
+            lineHeight: 1.1,
+            letterSpacing: "-0.02em"
+          }
+        }, "Prompting at Work"),
+        /*#__PURE__*/React.createElement("p", {
+          style: {
+            fontSize: 16,
+            color: "#C2C2C2",
+            margin: "0 0 1.5rem",
+            lineHeight: 1.6
+          }
+        }, "Structure your prompt, and the output takes care of itself."),
+        /*#__PURE__*/React.createElement("div", {
+          style: {
+            background: "#2A2A2A",
+            borderTop: "3px solid #555",
+            borderRadius: "0 0 4px 4px",
+            padding: "12px 16px",
+            fontSize: 13,
+            color: "#C2C2C2",
+            lineHeight: 1.6
+          }
+        },
+          /*#__PURE__*/React.createElement("strong", { style: { color: "#F7F6F3" } }, "How to use this guide:"),
+          " New here? Start at 01\u2014ORIENT. Returning? Jump to any tab \u2014 each is self-contained."
+        )
+      )
+    ),
+    /*#__PURE__*/React.createElement("div", {
       style: {
-        background: copied === p.name ? "#1A1A1A" : "#F0EDE8",
-        color: copied === p.name ? "#E8C547" : "#555",
-        border: "none",
-        borderRadius: 6,
-        padding: "8px 12px",
-        fontSize: 12,
-        cursor: "pointer",
-        fontWeight: 600,
-        whiteSpace: "nowrap",
-        transition: "all 0.2s"
+        background: "#EEECEA",
+        borderBottom: "1px solid #D9D6D0",
+        overflowX: "auto",
+        WebkitOverflowScrolling: "touch"
       }
-    }, copied === p.name ? "Copied!" : "Copy")));
-  })), /*#__PURE__*/React.createElement("div", {
-    style: {
-      background: "#F7F6F3",
-      border: "1px solid #E0DDD8",
-      borderLeft: "4px solid #E05C5C",
-      borderRadius: 8,
-      padding: "20px 24px"
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontWeight: 800,
-      fontSize: 15,
-      marginBottom: 16
-    }
-  }, "\uD83D\uDD27 When It Breaks: 3 Failure Modes"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "grid",
-      gap: 12
-    }
-  }, failures.map(function (f) {
-    return /*#__PURE__*/React.createElement("div", {
-      key: f.mode,
-      style: {
-        display: "flex",
-        gap: 12
-      }
-    }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontWeight: 700,
-        fontSize: 14,
-        marginBottom: 3
-      }
-    }, f.mode), /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 13,
-        color: "#555"
-      }
-    }, "\u2192 ", f.fix)));
-  })))), active === "starters" && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(SectionHeader, {
-    title: "Copy / Paste Starters",
-    sub: "Drop in. Fill blanks. Send."
-  }), /*#__PURE__*/React.createElement(SectionEpigraph, {
-    quote: sectionPrinciples["starters"].quote,
-    note: sectionPrinciples["starters"].note
-  }), /*#__PURE__*/React.createElement("p", {
-    style: {
-      color: "#555",
-      marginBottom: 24,
-      fontSize: 15
-    }
-  }, "Every starter is self-contained. Replace text in [brackets] and send \u2014 no setup required."), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "grid",
-      gap: 16
-    }
-  }, starters.map(function (s) {
-    return /*#__PURE__*/React.createElement("div", {
-      key: s.label,
-      style: {
-        background: "#fff",
-        border: "1px solid #E0DDD8",
-        borderRadius: 8,
-        padding: "18px 20px"
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontWeight: 800,
-        fontSize: 14,
-        marginBottom: 10
-      }
-    }, s.label), /*#__PURE__*/React.createElement("div", {
-      style: {
-        display: "flex",
-        gap: 10,
-        alignItems: "flex-start"
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        display: "flex",
-        flexDirection: "column",
-        gap: 10,
-        flex: 1,
-        minWidth: 0
-      }
-    }, /*#__PURE__*/React.createElement("pre", {
-      style: {
-        margin: 0,
-        fontSize: 13,
-        color: "#333",
-        background: "#F7F6F3",
-        padding: "12px 16px",
-        borderRadius: 6,
-        whiteSpace: "pre-wrap",
-        lineHeight: 1.7
-      }
-    }, s.code), s.tip && /*#__PURE__*/React.createElement("div", {
-      style: {
-        background: "#FFF8E1",
-        border: "1px solid #E8C547",
-        borderRadius: 6,
-        padding: "10px 14px",
-        fontSize: 13,
-        color: "#555"
-      }
-    }, s.tip)), /*#__PURE__*/React.createElement("button", {
-      onClick: function onClick() {
-        return copy(s.code, s.label);
-      },
-      "aria-label": "Copy " + s.label + " starter",
-      style: {
-        background: copied === s.label ? "#1A1A1A" : "#F0EDE8",
-        color: copied === s.label ? "#E8C547" : "#555",
-        border: "none",
-        borderRadius: 6,
-        padding: "8px 12px",
-        fontSize: 12,
-        cursor: "pointer",
-        fontWeight: 600,
-        whiteSpace: "nowrap",
-        transition: "all 0.2s",
-        flexShrink: 0
-      }
-    }, copied === s.label ? "Copied!" : "Copy")));
-  }))), active === "verify" && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(SectionHeader, {
-    title: "Review Before You Use It",
-    sub: "The final check for high-stakes output."
-  }), /*#__PURE__*/React.createElement(SectionEpigraph, {
-    quote: sectionPrinciples["verify"].quote,
-    note: sectionPrinciples["verify"].note
-  }), /*#__PURE__*/React.createElement("p", {
-    style: {
-      color: "#555",
-      marginBottom: 16,
-      fontSize: 15
-    }
-  }, "Every AI output is a draft until you've reviewed it. The checklist below is ordered from highest to lowest risk \u2014 start at the top."), /*#__PURE__*/React.createElement("div", {
-    style: {
-      marginBottom: 24,
-      background: "#fff",
-      border: "1px solid #E0DDD8",
-      borderRadius: 8,
-      padding: "12px 16px"
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: 8
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 12,
-      fontWeight: 700,
-      color: "#1A1A1A"
-    }
-  }, checkedCount + " / " + totalItems + " reviewed"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 11,
-      color: "#888"
-    }
-  }, checkedCount === totalItems ? "\u2713 All done" : "")), /*#__PURE__*/React.createElement("div", {
-    style: {
-      height: 6,
-      background: "#F0EDE8",
-      borderRadius: 4,
-      overflow: "hidden"
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      height: "100%",
-      width: (checkedCount / totalItems * 100) + "%",
-      background: "#C8A020",
-      borderRadius: 4,
-      transition: "width 0.3s ease"
-    }
-  }))), /*#__PURE__*/React.createElement("div", {
-    style: {
-      marginBottom: 24
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: 10
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontWeight: 800,
-      fontSize: 13,
-      letterSpacing: "0.1em",
-      textTransform: "uppercase",
-      color: "#E05C5C"
-    }
-  }, "Critical \u2014 do not skip"), /*#__PURE__*/React.createElement("button", {
-    onClick: function onClick() {
-      setChecked({});
-      try {
-        sessionStorage.removeItem("cl_checked");
-      } catch (_unused3) {}
     },
-    "aria-label": "Clear all checklist items",
-    style: {
-      background: "transparent",
-      border: "1px solid #D9D6D0",
-      borderRadius: 6,
-      padding: "4px 12px",
-      fontSize: 11,
-      color: "#888",
-      fontWeight: 600,
-      cursor: "pointer",
-      letterSpacing: "0.04em"
-    }
-  }, "Clear all")), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "grid",
-      gap: 8
-    }
-  }, checklist.critical.map(function (c) {
-    return /*#__PURE__*/React.createElement("div", {
-      key: c.item,
-      style: {
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        background: "#FFF5F5",
-        border: "1px solid #F0C0C0",
-        borderRadius: 8,
-        padding: "12px 16px",
-        gap: 12,
-        flexWrap: "wrap"
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        display: "flex",
-        gap: 10,
-        alignItems: "center"
-      }
-    }, /*#__PURE__*/React.createElement("input", {
-      type: "checkbox",
-      checked: !!checked[c.item],
-      onChange: function onChange() {
-        return toggleCheck(c.item);
-      },
-      style: {
-        width: 16,
-        height: 16,
-        accentColor: "#E05C5C",
-        flexShrink: 0,
-        cursor: "pointer"
-      }
-    }), /*#__PURE__*/React.createElement("span", {
-      style: {
-        fontSize: 14
-      }
-    }, c.item)), /*#__PURE__*/React.createElement("span", {
-      style: {
-        fontSize: 12,
-        color: "#E05C5C",
-        fontWeight: 600,
-        whiteSpace: "nowrap"
-      }
-    }, c.risk));
-  }))), /*#__PURE__*/React.createElement("div", {
-    style: {
-      marginBottom: 24
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontWeight: 800,
-      fontSize: 13,
-      letterSpacing: "0.1em",
-      textTransform: "uppercase",
-      color: "#C07A00",
-      marginBottom: 10
-    }
-  }, "Important \u2014 strongly recommended"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "grid",
-      gap: 8
-    }
-  }, checklist.important.map(function (c) {
-    return /*#__PURE__*/React.createElement("div", {
-      key: c.item,
-      style: {
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        background: "#FFFBF0",
-        border: "1px solid #E8C547",
-        borderRadius: 8,
-        padding: "12px 16px",
-        gap: 12,
-        flexWrap: "wrap"
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        display: "flex",
-        gap: 10,
-        alignItems: "center"
-      }
-    }, /*#__PURE__*/React.createElement("input", {
-      type: "checkbox",
-      checked: !!checked[c.item],
-      onChange: function onChange() {
-        return toggleCheck(c.item);
-      },
-      style: {
-        width: 16,
-        height: 16,
-        accentColor: "#C07A00",
-        flexShrink: 0,
-        cursor: "pointer"
-      }
-    }), /*#__PURE__*/React.createElement("span", {
-      style: {
-        fontSize: 14
-      }
-    }, c.item)), /*#__PURE__*/React.createElement("span", {
-      style: {
-        fontSize: 12,
-        color: "#C07A00",
-        fontWeight: 600,
-        whiteSpace: "nowrap"
-      }
-    }, c.risk));
-  }))), /*#__PURE__*/React.createElement("div", {
-    style: {
-      marginBottom: 32
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontWeight: 800,
-      fontSize: 13,
-      letterSpacing: "0.1em",
-      textTransform: "uppercase",
-      color: "#888",
-      marginBottom: 10
-    }
-  }, "Nice to Have"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "grid",
-      gap: 8
-    }
-  }, checklist.niceToHave.map(function (c) {
-    return /*#__PURE__*/React.createElement("div", {
-      key: c.item,
-      style: {
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        background: "#F7F6F3",
-        border: "1px solid #DDD",
-        borderRadius: 8,
-        padding: "12px 16px",
-        gap: 12,
-        flexWrap: "wrap"
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        display: "flex",
-        gap: 10,
-        alignItems: "center"
-      }
-    }, /*#__PURE__*/React.createElement("input", {
-      type: "checkbox",
-      checked: !!checked[c.item],
-      onChange: function onChange() {
-        return toggleCheck(c.item);
-      },
-      style: {
-        width: 16,
-        height: 16,
-        flexShrink: 0,
-        cursor: "pointer"
-      }
-    }), /*#__PURE__*/React.createElement("span", {
-      style: {
-        fontSize: 14,
-        color: "#555"
-      }
-    }, c.item)), /*#__PURE__*/React.createElement("span", {
-      style: {
-        fontSize: 12,
-        color: "#999",
-        fontWeight: 600,
-        whiteSpace: "nowrap"
-      }
-    }, c.risk));
-  }))), /*#__PURE__*/React.createElement("div", {
-    style: {
-      background: "#1A1A1A",
-      borderRadius: 10,
-      padding: "24px 28px",
-      textAlign: "center"
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 11,
-      letterSpacing: "0.18em",
-      color: "#888",
-      fontWeight: 600,
-      marginBottom: 14,
-      textTransform: "uppercase"
-    }
-  }, "North Star Principle"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: "clamp(1.1rem, 3vw, 1.4rem)",
-      color: "#F7F6F3",
-      fontWeight: 800,
-      fontStyle: "italic",
-      lineHeight: 1.5
-    }
-  }, /*#__PURE__*/React.createElement("div", null, "\"Prompt \u2192 Inspect \u2192 Refine \u2192 Verify.\""), /*#__PURE__*/React.createElement("div", {
-    style: {
-      marginTop: 8
-    }
-  }, "\"Don't use output for anything that matters without a human in the loop.\""))))));
+      /*#__PURE__*/React.createElement("div", {
+        style: {
+          maxWidth: 860,
+          margin: "0 auto",
+          display: "flex",
+          gap: 2,
+          padding: "0 2rem"
+        }
+      }, sections.map(function (s) {
+        return /*#__PURE__*/React.createElement("button", {
+          key: s.id,
+          onClick: function onClick() { return handleTabClick(s.id); },
+          "aria-label": s.label + " section",
+          style: {
+            background: active === s.id ? "#1A1A1A" : "transparent",
+            color: active === s.id ? "#F7F6F3" : "#555",
+            border: "none",
+            borderBottom: active === s.id ? "3px solid #E8C547" : "3px solid transparent",
+            padding: "12px 16px",
+            fontSize: 12,
+            fontWeight: 700,
+            letterSpacing: "0.08em",
+            cursor: "pointer",
+            whiteSpace: "nowrap",
+            textTransform: "uppercase",
+            transition: "all 0.15s"
+          }
+        }, s.label);
+      }))
+    ),
+    /*#__PURE__*/React.createElement("div", {
+      className: "content-area",
+      style: { maxWidth: 860, margin: "0 auto", padding: "2rem 2rem 4rem" }
+    },
+      active === "orient" && /*#__PURE__*/React.createElement("div", null,
+        /*#__PURE__*/React.createElement(SectionHeader, { title: "The CLEAR Method", sub: "Your five-step prompt that always works" }),
+        /*#__PURE__*/React.createElement(SectionEpigraph, { quote: sectionPrinciples["orient"].quote, note: sectionPrinciples["orient"].note }),
+        /*#__PURE__*/React.createElement("p", { style: { color: "#555", marginBottom: 28, fontSize: 15 } }, "Use this sequence when stakes are high, output must be reliable, or you're producing output you'll share with others."),
+        /*#__PURE__*/React.createElement("div", { style: { display: "grid", gap: 12 } }, clearSteps.map(function (s) {
+          return /*#__PURE__*/React.createElement("div", {
+            key: s.letter,
+            style: {
+              display: "flex",
+              gap: 16,
+              background: "#fff",
+              border: "1px solid #E0DDD8",
+              borderRadius: 8,
+              padding: "16px 20px",
+              alignItems: "center"
+            }
+          },
+            /*#__PURE__*/React.createElement("div", {
+              style: {
+                minWidth: 44,
+                height: 44,
+                background: "#1A1A1A",
+                color: "#E8C547",
+                borderRadius: 6,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontWeight: 900,
+                fontSize: 20,
+                fontFamily: "monospace",
+                flexShrink: 0
+              }
+            }, s.letter),
+            /*#__PURE__*/React.createElement("div", null,
+              /*#__PURE__*/React.createElement("div", { style: { fontWeight: 700, fontSize: 15, marginBottom: 4 } }, s.word),
+              /*#__PURE__*/React.createElement("div", { style: { color: "#555", fontSize: 14 } }, s.desc)
+            )
+          );
+        })),
+        /*#__PURE__*/React.createElement("div", {
+          style: { marginTop: 28, background: "#1A1A1A", borderRadius: 8, padding: "20px 24px" }
+        },
+          /*#__PURE__*/React.createElement("div", {
+            style: {
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 6
+            }
+          },
+            /*#__PURE__*/React.createElement("div", {
+              style: {
+                fontSize: 11,
+                letterSpacing: "0.15em",
+                color: "#AAA",
+                fontWeight: 600,
+                textTransform: "uppercase"
+              }
+            }, "Universal Starter Prompt"),
+            /*#__PURE__*/React.createElement("button", {
+              onClick: function onClick() {
+                return copy("You are a [role] helping [audience].\n[Write / Analyze / Summarize] [task].\nContext: [paste what matters].\nInclude: [must-haves].\nAvoid: [exclusions].\nFormat: [e.g., 3 bullets / table / short paragraph / keep under X words].\nBefore writing, list your assumptions and any facts I should verify.", "universal-starter");
+              },
+              "aria-label": "Copy universal starter prompt",
+              style: {
+                background: copied === "universal-starter" ? "#E8C547" : "#333",
+                color: copied === "universal-starter" ? "#1A1A1A" : "#E8C547",
+                border: "none",
+                borderRadius: 6,
+                padding: "6px 14px",
+                fontSize: 12,
+                cursor: "pointer",
+                fontWeight: 700,
+                transition: "all 0.2s"
+              }
+            }, copied === "universal-starter" ? "Copied!" : "Copy")
+          ),
+          /*#__PURE__*/React.createElement("div", {
+            style: {
+              fontSize: 12,
+              color: "#E0DDD8",
+              fontStyle: "italic",
+              marginBottom: 12,
+              lineHeight: 1.5
+            }
+          }, "This prompt applies all five CLEAR steps in sequence. The opening line is optional \u2014 add it when tone, expertise level, or audience specificity matters."),
+          /*#__PURE__*/React.createElement("pre", {
+            style: {
+              color: "#E8C547",
+              fontSize: 13,
+              lineHeight: 1.7,
+              margin: 0,
+              whiteSpace: "pre-wrap"
+            }
+          }, "You are a [role] helping [audience].\n[Write / Analyze / Summarize] [task].\nContext: [paste what matters].\nInclude: [must-haves].\nAvoid: [exclusions].\nFormat: [e.g., 3 bullets / table / short paragraph / keep under X words].\nBefore writing, list your assumptions and any facts I should verify.")
+        )
+      ),
+      active === "build" && /*#__PURE__*/React.createElement("div", null,
+        /*#__PURE__*/React.createElement(SectionHeader, { title: "Anatomy of a Strong Prompt", sub: "Seven ingredients. Use what you need." }),
+        /*#__PURE__*/React.createElement(SectionEpigraph, { quote: sectionPrinciples["build"].quote, note: sectionPrinciples["build"].note }),
+        /*#__PURE__*/React.createElement("p", { style: { color: "#555", marginBottom: 24, fontSize: 15 } }, "Not every prompt needs all seven. A quick task might only need TASK + FORMAT. A high-stakes deliverable needs all of them."),
+        /*#__PURE__*/React.createElement("div", { style: { display: "grid", gap: 8, marginBottom: 32 } }, ingredients.map(function (ing) {
+          return /*#__PURE__*/React.createElement("div", {
+            key: ing.label,
+            style: {
+              display: "flex",
+              gap: 16,
+              background: "#fff",
+              border: "1px solid #E0DDD8",
+              borderRadius: 8,
+              padding: "14px 20px",
+              alignItems: "center"
+            }
+          },
+            /*#__PURE__*/React.createElement("div", {
+              style: {
+                width: 110,
+                minWidth: 110,
+                fontWeight: 800,
+                fontSize: 12,
+                letterSpacing: "0.1em",
+                color: "#1A1A1A",
+                background: "#F0EDE8",
+                padding: "4px 14px",
+                borderRadius: 4,
+                textAlign: "center",
+                flexShrink: 0
+              }
+            }, ing.label),
+            /*#__PURE__*/React.createElement("div", { style: { color: "#444", fontSize: 14 } }, ing.desc)
+          );
+        })),
+        /*#__PURE__*/React.createElement("div", {
+          style: {
+            background: "#FFF8E1",
+            border: "1px solid #E8C547",
+            borderRadius: 8,
+            padding: "16px 20px",
+            marginBottom: 20
+          }
+        },
+          /*#__PURE__*/React.createElement("div", { style: { fontWeight: 700, marginBottom: 6, fontSize: 14 } }, "Pro tip: Priming works"),
+          /*#__PURE__*/React.createElement("p", { style: { margin: 0, color: "#444", fontSize: 14, lineHeight: 1.6 } },
+            "Opening with ",
+            /*#__PURE__*/React.createElement("em", null, "\"You are a [role] helping [audience]\u2026\""),
+            " before your actual request isn't flattery \u2014 it primes the model's response style, vocabulary, and depth. A prompt primed for a senior analyst reads differently than one primed for a general audience."
+          )
+        ),
+        /*#__PURE__*/React.createElement("div", {
+          style: {
+            background: "#F0F4FF",
+            border: "1px solid #C5D0F0",
+            borderRadius: 8,
+            padding: "16px 20px"
+          }
+        },
+          /*#__PURE__*/React.createElement("div", { style: { fontWeight: 700, marginBottom: 6, fontSize: 14 } }, "Pro tip: Anchor the output"),
+          /*#__PURE__*/React.createElement("p", { style: { margin: 0, color: "#444", fontSize: 14, lineHeight: 1.6 } }, "Paste a short example of the output you want \u2014 even a rough sketch. Output anchoring dramatically reduces formatting surprises. One good example beats three paragraphs of format instructions.")
+        )
+      ),
+      active === "execute" && /*#__PURE__*/React.createElement("div", null,
+        /*#__PURE__*/React.createElement(SectionHeader, { title: "Prompt Patterns", sub: "Pick the one that fits your situation." }),
+        /*#__PURE__*/React.createElement(SectionEpigraph, { quote: sectionPrinciples["execute"].quote, note: sectionPrinciples["execute"].note }),
+        /*#__PURE__*/React.createElement("p", { style: { color: "#555", marginBottom: 24, fontSize: 15 } }, "Each pattern targets a specific failure mode. Read the \"use when\" trigger to find your situation, then copy the pattern."),
+        /*#__PURE__*/React.createElement("div", { style: { display: "grid", gap: 12, marginBottom: 32 } }, patterns.map(function (p) {
+          return /*#__PURE__*/React.createElement("div", {
+            key: p.name,
+            style: {
+              background: "#fff",
+              border: "1px solid #E0DDD8",
+              borderRadius: 8,
+              padding: "16px 20px"
+            }
+          },
+            /*#__PURE__*/React.createElement("div", { style: { marginBottom: 10 } },
+              /*#__PURE__*/React.createElement("div", { style: { fontWeight: 800, fontSize: 15, marginBottom: 4 } }, p.name),
+              /*#__PURE__*/React.createElement("div", { style: { fontSize: 12, color: "#555", fontStyle: "normal" } }, "Use when: ", p.trigger)
+            ),
+            /*#__PURE__*/React.createElement("div", { style: { display: "flex", alignItems: "flex-start", gap: 10 } },
+              /*#__PURE__*/React.createElement("pre", {
+                style: {
+                  margin: 0,
+                  fontSize: 13,
+                  color: "#333",
+                  background: "#F7F6F3",
+                  padding: "10px 14px",
+                  borderRadius: 6,
+                  flex: 1,
+                  whiteSpace: "pre-wrap",
+                  lineHeight: 1.6
+                }
+              }, p.prompt),
+              /*#__PURE__*/React.createElement("button", {
+                onClick: function onClick() { return copy(p.prompt, p.name); },
+                "aria-label": "Copy " + p.name + " prompt",
+                style: {
+                  background: copied === p.name ? "#1A1A1A" : "#F0EDE8",
+                  color: copied === p.name ? "#E8C547" : "#555",
+                  border: "none",
+                  borderRadius: 6,
+                  padding: "8px 12px",
+                  fontSize: 12,
+                  cursor: "pointer",
+                  fontWeight: 600,
+                  whiteSpace: "nowrap",
+                  transition: "all 0.2s"
+                }
+              }, copied === p.name ? "Copied!" : "Copy")
+            )
+          );
+        })),
+        /*#__PURE__*/React.createElement("div", {
+          style: {
+            background: "#F7F6F3",
+            border: "1px solid #E0DDD8",
+            borderLeft: "4px solid #E05C5C",
+            borderRadius: 8,
+            padding: "20px 24px"
+          }
+        },
+          /*#__PURE__*/React.createElement("div", { style: { fontWeight: 800, fontSize: 15, marginBottom: 16 } }, "\uD83D\uDD27 When It Breaks: 3 Failure Modes"),
+          /*#__PURE__*/React.createElement("div", { style: { display: "grid", gap: 12 } }, failures.map(function (f) {
+            return /*#__PURE__*/React.createElement("div", { key: f.mode, style: { display: "flex", gap: 12 } },
+              /*#__PURE__*/React.createElement("div", null,
+                /*#__PURE__*/React.createElement("div", { style: { fontWeight: 700, fontSize: 14, marginBottom: 3 } }, f.mode),
+                /*#__PURE__*/React.createElement("div", { style: { fontSize: 13, color: "#555" } }, "\u2192 ", f.fix)
+              )
+            );
+          }))
+        )
+      ),
+      active === "starters" && /*#__PURE__*/React.createElement("div", null,
+        /*#__PURE__*/React.createElement(SectionHeader, { title: "Copy / Paste Starters", sub: "Drop in. Fill blanks. Send." }),
+        /*#__PURE__*/React.createElement(SectionEpigraph, { quote: sectionPrinciples["starters"].quote, note: sectionPrinciples["starters"].note }),
+        /*#__PURE__*/React.createElement("p", { style: { color: "#555", marginBottom: 24, fontSize: 15 } }, "Every starter is self-contained. Replace text in [brackets] and send \u2014 no setup required."),
+        /*#__PURE__*/React.createElement("div", { style: { display: "grid", gap: 16 } }, starters.map(function (s) {
+          return /*#__PURE__*/React.createElement("div", {
+            key: s.label,
+            style: {
+              background: "#fff",
+              border: "1px solid #E0DDD8",
+              borderRadius: 8,
+              padding: "18px 20px"
+            }
+          },
+            /*#__PURE__*/React.createElement("div", { style: { fontWeight: 800, fontSize: 14, marginBottom: 10 } }, s.label),
+            /*#__PURE__*/React.createElement("div", { style: { display: "flex", gap: 10, alignItems: "flex-start" } },
+              /*#__PURE__*/React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 10, flex: 1, minWidth: 0 } },
+                /*#__PURE__*/React.createElement("pre", {
+                  style: {
+                    margin: 0,
+                    fontSize: 13,
+                    color: "#333",
+                    background: "#F7F6F3",
+                    padding: "12px 16px",
+                    borderRadius: 6,
+                    whiteSpace: "pre-wrap",
+                    lineHeight: 1.7
+                  }
+                }, s.code),
+                s.tip && /*#__PURE__*/React.createElement("div", {
+                  style: {
+                    background: "#FFF8E1",
+                    border: "1px solid #E8C547",
+                    borderRadius: 6,
+                    padding: "10px 14px",
+                    fontSize: 13,
+                    color: "#555"
+                  }
+                }, s.tip)
+              ),
+              /*#__PURE__*/React.createElement("button", {
+                onClick: function onClick() { return copy(s.code, s.label); },
+                "aria-label": "Copy " + s.label + " starter",
+                style: {
+                  background: copied === s.label ? "#1A1A1A" : "#F0EDE8",
+                  color: copied === s.label ? "#E8C547" : "#555",
+                  border: "none",
+                  borderRadius: 6,
+                  padding: "8px 12px",
+                  fontSize: 12,
+                  cursor: "pointer",
+                  fontWeight: 600,
+                  whiteSpace: "nowrap",
+                  transition: "all 0.2s",
+                  flexShrink: 0
+                }
+              }, copied === s.label ? "Copied!" : "Copy")
+            )
+          );
+        }))
+      ),
+      active === "verify" && /*#__PURE__*/React.createElement("div", null,
+        /*#__PURE__*/React.createElement(SectionHeader, {
+          title: "Review Before You Use It",
+          sub: "Every output gets a review. The stakes decide how deep."
+        }),
+        /*#__PURE__*/React.createElement(SectionEpigraph, {
+          quote: sectionPrinciples["verify"].quote,
+          note: sectionPrinciples["verify"].note
+        }),
+        /*#__PURE__*/React.createElement("p", {
+          style: { color: "#555", marginBottom: 16, fontSize: 15 }
+        }, "Use this before sharing or acting on any AI output. The stakes determine how many items apply \u2014 a quick internal note needs one check; a client-facing deliverable needs all of them."),
+        /*#__PURE__*/React.createElement("div", {
+          style: {
+            marginBottom: 20,
+            background: "#fff",
+            border: "1px solid #E0DDD8",
+            borderRadius: 8,
+            padding: "12px 16px"
+          }
+        },
+          /*#__PURE__*/React.createElement("div", {
+            style: {
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 8
+            }
+          },
+            /*#__PURE__*/React.createElement("div", {
+              style: { fontSize: 12, fontWeight: 700, color: "#1A1A1A" }
+            }, checkedCount + " / " + totalItems + " reviewed"),
+            /*#__PURE__*/React.createElement("div", {
+              style: { fontSize: 11, color: "#888" }
+            }, checkedCount === totalItems ? "\u2713 All done" : "")
+          ),
+          /*#__PURE__*/React.createElement("div", {
+            style: {
+              height: 6,
+              background: "#F0EDE8",
+              borderRadius: 4,
+              overflow: "hidden"
+            }
+          },
+            /*#__PURE__*/React.createElement("div", {
+              style: {
+                height: "100%",
+                width: (totalItems > 0 ? checkedCount / totalItems * 100 : 0) + "%",
+                background: "#C8A020",
+                borderRadius: 4,
+                transition: "width 0.3s ease"
+              }
+            })
+          )
+        ),
+        /*#__PURE__*/React.createElement("div", {
+          style: {
+            display: "flex",
+            gap: 4,
+            marginBottom: 24
+          }
+        }, stakeLevels.map(function (lvl) {
+          var isActive = stakeLevel === lvl.id;
+          return /*#__PURE__*/React.createElement("button", {
+            key: lvl.id,
+            onClick: function onClick() { return setStakeLevel(lvl.id); },
+            "aria-label": lvl.label + " stake level",
+            style: {
+              background: isActive ? "#1A1A1A" : "#F0EDE8",
+              color: isActive ? "#F7F6F3" : "#555",
+              border: "none",
+              borderRadius: 6,
+              padding: "6px 14px",
+              fontSize: 12,
+              fontWeight: 700,
+              cursor: "pointer",
+              transition: "all 0.15s",
+              flex: 1
+            }
+          }, lvl.label);
+        })),
+        /*#__PURE__*/React.createElement("div", {
+          style: { marginBottom: 8 }
+        },
+          /*#__PURE__*/React.createElement("div", {
+            style: {
+              display: "flex",
+              justifyContent: "flex-end",
+              marginBottom: 16
+            }
+          },
+            /*#__PURE__*/React.createElement("button", {
+              onClick: function onClick() {
+                setChecked({});
+                try {
+                  sessionStorage.removeItem("cl_checked");
+                } catch (_unused3) {}
+              },
+              "aria-label": "Clear all checklist items",
+              style: {
+                background: "transparent",
+                border: "1px solid #D9D6D0",
+                borderRadius: 6,
+                padding: "4px 12px",
+                fontSize: 11,
+                color: "#888",
+                fontWeight: 600,
+                cursor: "pointer",
+                letterSpacing: "0.04em"
+              }
+            }, "Clear all")
+          ),
+          renderTier("always", checklist.always),
+          (stakeLevel === "standard" || stakeLevel === "full") && renderTier("shared", checklist.shared),
+          stakeLevel === "full" && renderTier("highStakes", checklist.highStakes)
+        ),
+        /*#__PURE__*/React.createElement("div", {
+          style: {
+            background: "#1A1A1A",
+            borderRadius: 10,
+            padding: "24px 28px",
+            textAlign: "center"
+          }
+        },
+          /*#__PURE__*/React.createElement("div", {
+            style: {
+              fontSize: 11,
+              letterSpacing: "0.18em",
+              color: "#888",
+              fontWeight: 600,
+              marginBottom: 14,
+              textTransform: "uppercase"
+            }
+          }, "North Star Principle"),
+          /*#__PURE__*/React.createElement("div", {
+            style: {
+              fontSize: "clamp(1.1rem, 3vw, 1.4rem)",
+              color: "#F7F6F3",
+              fontWeight: 800,
+              fontStyle: "italic",
+              lineHeight: 1.5
+            }
+          },
+            /*#__PURE__*/React.createElement("div", null, "\"Prompt \u2192 Inspect \u2192 Refine \u2192 Verify.\""),
+            /*#__PURE__*/React.createElement("div", { style: { marginTop: 8 } }, "\"Don't use output for anything that matters without a human in the loop.\"")
+          )
+        )
+      ) // end verify section
+    )
+  );
 }
 ReactDOM.createRoot(document.getElementById("root")).render(/*#__PURE__*/React.createElement(App, null));
 </script>
@@ -1186,7 +1022,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(/*#__PURE__*/React.c
   Built by <a href="https://github.com/built-by-justin" target="_blank" rel="noopener noreferrer"
      style="color: #888; text-decoration: none; border-bottom: 1px solid #444; padding-bottom: 1px; transition: color 0.15s;"
      onmouseover="this.style.color='#E8C547'; this.style.borderBottomColor='#E8C547';"
-     onmouseout="this.style.color='#888'; this.style.borderBottomColor='#444';">Justin</a> &nbsp;&middot;&nbsp; v1.3.6 (dev)
+     onmouseout="this.style.color='#888'; this.style.borderBottomColor='#444';">Justin</a> &nbsp;&middot;&nbsp; v1.4.0 (dev)
 </footer>
 </body>
 </html>
